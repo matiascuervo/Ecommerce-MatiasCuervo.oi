@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Shop Startup</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <h1 class="logo">E-Shop.</h1>
+            <nav class="nav-links">
+                <a href="#products">Productos</a>
+                <button id="cart-btn" class="cart-btn">
+                    🛒 Carrito <span id="cart-count" class="badge">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Descubre Nuestros Productos Exclusivos</h2>
+            <p>Calidad, diseño y funcionalidad en un solo lugar.</p>
+        </section>
+
+        <!-- Loader -->
+        <div id="loader" class="loader hidden">Cargando productos...</div>
+
+        <!-- Products Container -->
+        <section id="products" class="products-grid">
+            <!-- Dynamically populated via JS -->
+        </section>
+    </main>
+
+    <!-- Modal Carrito -->
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tu Carrito</h2>
+                <button class="close-btn" id="close-cart">&times;</button>
+            </div>
+            <div id="cart-items" class="cart-items-container">
+                <!-- Cart items dynamically filled here -->
+            </div>
+            <div class="cart-summary">
+                <h3>Total: $<span id="cart-total">0.00</span></h3>
+                <button id="checkout-btn" class="btn-primary">Finalizar Compra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
