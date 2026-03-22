@@ -58,9 +58,9 @@ namespace ECommerce.API.Controllers
                 Items = items,
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = "http://localhost:5500/index.html", 
-                    Failure = "http://localhost:5500/index.html",
-                    Pending = "http://localhost:5500/index.html"
+                   Success = "http://127.0.0.1:5500/index.html", 
+                    Failure = "http://127.0.0.1:5500/index.html",
+                    Pending = "http://127.0.0.1:5500/index.html"
                 }
             };
 

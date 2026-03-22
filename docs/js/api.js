@@ -1,6 +1,6 @@
 // api.js
 // Base API URL
-const API_BASE_URL = 'http://localhost:5157/api'; // Cambiar por el puerto real HTTPS del backend
+const API_BASE_URL = 'https://ecommerce-matiascuervooi-production.up.railway.app/api'; // Cambiar por el puerto real HTTPS del backend
 
 export const api = {
     async getProducts() {
