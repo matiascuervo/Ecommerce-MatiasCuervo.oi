@@ -1,6 +1,15 @@
 using ECommerce.API.Data;
 using Microsoft.EntityFrameworkCore;
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
