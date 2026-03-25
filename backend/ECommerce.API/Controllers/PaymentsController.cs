@@ -18,7 +18,7 @@ namespace ECommerce.API.Controllers
         {
             _context = context;
             _configuration = configuration;
-            MercadoPagoConfig.AccessToken = "TEST-1654585096853637-032018-6e50c45e5605a72f3bf6eb7b1eab4424-153301281";
+            MercadoPagoConfig.AccessToken = "APP_USR-6086348995690011-032421-972cba518d85919a43d9016a505b28ef-3291648300";
         }
 
         public class PaymentRequest
