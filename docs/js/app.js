@@ -36,6 +36,23 @@ function setupEventListeners() {
         if (e.target === cartModal) cartModal.classList.add('hidden');
     });
 
+    // Event Delegation for Add to Cart
+    productsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('add-to-cart')) {
+            const productId = parseInt(e.target.dataset.id);
+            addToCart(productId);
+        }
+    });
+
+    // Event Delegation for Cart quantity changes
+    cartItemsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('qty-btn')) {
+            const productId = parseInt(e.target.dataset.id);
+            const change = parseInt(e.target.dataset.change);
+            updateQuantity(productId, change);
+        }
+    });
+
     checkoutBtn.addEventListener('click', handleCheckout);
 }
 
@@ -58,12 +75,15 @@ function renderProducts() {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-            <img src="${product.imageUrl || 'https://via.placeholder.com/300'}" alt="${product.name}" class="product-img">
+            <img src="${product.imageUrl || 'https://via.placeholder.com/300'}" 
+                 alt="${product.name}" 
+                 class="product-img" 
+                 loading="lazy">
             <div class="product-info">
                 <h3 class="product-title">${product.name}</h3>
                 <p class="product-desc">${product.description}</p>
                 <div class="product-price">$${product.price.toFixed(2)}</div>
-                <button class="btn-primary" onclick="window.addToCart(${product.id})">Agregar al Carrito</button>
+                <button class="btn-primary add-to-cart" data-id="${product.id}">Agregar al Carrito</button>
             </div>
         `;
         productsContainer.appendChild(card);
@@ -80,7 +100,7 @@ function loadMockProducts() {
     renderProducts();
 }
 
-window.addToCart = (productId) => {
+function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
@@ -114,7 +134,7 @@ function updateCartCount() {
     cartCountElement.textContent = count;
 }
 
-window.updateQuantity = (productId, change) => {
+function updateQuantity(productId, change) {
     const item = cart.find(i => i.id === productId);
     if (item) {
         item.quantity += change;
@@ -138,12 +158,7 @@ function renderCart() {
     cart.forEach(item => {
         total += item.price * item.quantity;
         const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.justifyContent = 'space-between';
-        div.style.alignItems = 'center';
-        div.style.marginBottom = '1rem';
-        div.style.paddingBottom = '1rem';
-        div.style.borderBottom = '1px solid var(--card-bg)';
+        div.className = 'cart-item';
         
         div.innerHTML = `
             <div style="flex:1">
@@ -151,9 +166,9 @@ function renderCart() {
                 <div style="color: var(--accent-color); font-weight: 600;">$${item.price.toFixed(2)}</div>
             </div>
             <div style="display:flex; align-items:center; gap: 0.5rem;">
-                <button onclick="window.updateQuantity(${item.id}, -1)" style="padding: 0.2rem 0.5rem; background: var(--card-bg); color: white; border:none; cursor:pointer; border-radius: 4px;">-</button>
+                <button class="qty-btn" data-id="${item.id}" data-change="-1" style="padding: 0.2rem 0.5rem; background: var(--card-bg); color: white; border:none; cursor:pointer; border-radius: 4px;">-</button>
                 <span style="min-width: 20px; text-align: center;">${item.quantity}</span>
-                <button onclick="window.updateQuantity(${item.id}, 1)" style="padding: 0.2rem 0.5rem; background: var(--card-bg); color: white; border:none; cursor:pointer; border-radius: 4px;">+</button>
+                <button class="qty-btn" data-id="${item.id}" data-change="1" style="padding: 0.2rem 0.5rem; background: var(--card-bg); color: white; border:none; cursor:pointer; border-radius: 4px;">+</button>
             </div>
         `;
         cartItemsContainer.appendChild(div);
@@ -186,7 +201,6 @@ async function handleCheckout(e) {
     checkoutBtn.textContent = 'Procesando...';
     
     try {
-        // ... (el resto de tu lógica de orderData queda igual)
         const orderData = {
             customerName: "Cliente de Prueba",
             customerEmail: "cliente@demomail.com",

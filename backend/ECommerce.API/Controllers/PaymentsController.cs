@@ -1,7 +1,9 @@
 using ECommerce.API.Data;
 using Microsoft.AspNetCore.Mvc;
 using MercadoPago.Client.Preference;
+using MercadoPago.Client.Payment;
 using MercadoPago.Config;
+using MercadoPago.Resource.Payment;
 using MercadoPago.Resource.Preference;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +20,7 @@ namespace ECommerce.API.Controllers
         {
             _context = context;
             _configuration = configuration;
-            MercadoPagoConfig.AccessToken = "APP_USR-6086348995690011-032421-972cba518d85919a43d9016a505b28ef-3291648300";
+            MercadoPagoConfig.AccessToken = _configuration["MercadoPago:AccessToken"];
         }
 
         public class PaymentRequest
@@ -56,12 +58,15 @@ namespace ECommerce.API.Controllers
             var preferenceRequest = new PreferenceRequest
             {
                 Items = items,
+                ExternalReference = order.Id.ToString(),
+                NotificationUrl = $"{_configuration["MercadoPago:NotificationUrlBase"]}/api/payments/webhook",
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                   Success = "http://127.0.0.1:5500/index.html", 
+                    Success = "http://127.0.0.1:5500/index.html", 
                     Failure = "http://127.0.0.1:5500/index.html",
                     Pending = "http://127.0.0.1:5500/index.html"
-                }
+                },
+                AutoReturn = "approved"
             };
 
             var client = new PreferenceClient();
@@ -76,6 +81,59 @@ namespace ECommerce.API.Controllers
                 InitPoint = preference.InitPoint,
                 SandboxInitPoint = preference.SandboxInitPoint
             });
+        }
+
+        [HttpPost("webhook")]
+        public async Task<IActionResult> Webhook([FromQuery] string topic, [FromQuery] string id)
+        {
+            try
+            {
+                // Mercado Pago sends 'topic' for IPN or 'type' for Webhooks. 
+                // We handle both or focus on 'payment'.
+                string resourceId = id;
+                string resourceType = topic;
+
+                // If it's a webhook notification, it might come in the body
+                if (string.IsNullOrEmpty(resourceId))
+                {
+                    // For simplified Webhook v2, the ID might be in the body.
+                    // But let's stick to the query params for now as a baseline.
+                    return Ok(); 
+                }
+
+                if (resourceType == "payment")
+                {
+                    var client = new PaymentClient();
+                    Payment payment = await client.GetAsync(long.Parse(resourceId));
+
+                    if (payment != null && !string.IsNullOrEmpty(payment.ExternalReference))
+                    {
+                        var orderId = int.Parse(payment.ExternalReference);
+                        var order = await _context.Orders.FindAsync(orderId);
+
+                        if (order != null)
+                        {
+                            order.PaymentStatus = payment.Status switch
+                            {
+                                "approved" => "Paid",
+                                "rejected" => "PaymentRejected",
+                                "pending" => "PendingPayment",
+                                _ => order.PaymentStatus
+                            };
+
+                            await _context.SaveChangesAsync();
+                            Console.WriteLine($"Order {orderId} updated to {order.PaymentStatus}");
+                        }
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Webhook Error: {ex.Message}");
+                return StatusCode(500);
+            }
         }
     }
 }

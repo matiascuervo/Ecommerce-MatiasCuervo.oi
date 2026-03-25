@@ -87,6 +87,29 @@ body {
 .cart-items-container::-webkit-scrollbar { width: 6px; }
 .cart-items-container::-webkit-scrollbar-thumb { background: var(--card-bg); border-radius: 3px; }
 
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-bg);
+}
+
+.qty-btn {
+    padding: 0.2rem 0.5rem;
+    background: var(--card-bg);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background var(--transition-fast);
+}
+
+.qty-btn:hover {
+    background: var(--primary-color);
+}
+
 .cart-summary { border-top: 1px solid var(--card-bg); padding-top: 1.5rem; }
 .cart-summary h3 { display: flex; justify-content: space-between; margin-bottom: 1rem; }
 
